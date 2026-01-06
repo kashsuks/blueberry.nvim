@@ -14,6 +14,16 @@ function M.setup()
     gray = "#9399b2",
   }
 
+  -- highlight groups
+  local highlights = {
+    Normal = { fg = colors.fg, bg = colors.bg },
+  }
+
+  -- apply highlights
+  for group, opts in pairs(highlights) do
+    vim.api.nvim_set_hl(0, group, opts)
+  end
+
 end
 
 return M
