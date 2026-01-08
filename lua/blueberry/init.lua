@@ -3,7 +3,7 @@ local M = {}
 function M.setup()
 
   local colors = {
-    bg = "#89b4fa",
+    bg = "#1e1e2e",
     fg = "#b4befe",
     red = "#df4576",
     green = "#00ffd2",
@@ -17,6 +17,18 @@ function M.setup()
   -- highlight groups
   local highlights = {
     Normal = { fg = colors.fg, bg = colors.bg },
+    Comment = { fg = colors.gray, italic = true },
+    Keyword = { fg = colors.purple, bold = true },
+    String = { fg = colors.green },
+    Number = { fg = colors.yellow },
+    LineNr = { fg = colors.gray },
+    CursorLine = { bg = colors.bg },
+    StatusLine = { fg = colors.fg, bg = colors.blue },
+    Visual = { bg = colors.blue, fg = colors.bg },
+
+    -- tree sitter
+    ["@variable"] = { fg = colors.blue },
+    ["@keyword"] = { fg = colors.blue },
   }
 
   -- apply highlights
