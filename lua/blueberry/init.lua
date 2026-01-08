@@ -1,7 +1,8 @@
 local M = {}
 
 M.config = {
-  theme = "dark" -- can be "dark" or "light" by default
+  theme = "dark", -- can be "dark" or "light" by default
+  transparent = true,
 }
 
 local palettes = {
@@ -36,15 +37,19 @@ function M.setup(opts)
 
   vim.o.background = M.config.theme
 
+  local bg = M.config.transparent and "NONE" or colors.bg
+
   -- highlight groups
   local highlights = {
-    Normal = { fg = colors.fg, bg = colors.bg },
+    Normal = { fg = colors.fg, bg = bg },
+    NormalFloat = { fg = colors.fg, bg = bg},
+    SignColumn = { bg = bg },
     Comment = { fg = colors.gray, italic = true },
     Keyword = { fg = colors.purple, bold = true },
     String = { fg = colors.green },
     Number = { fg = colors.yellow },
-    LineNr = { fg = colors.gray },
-    CursorLine = { bg = colors.bg },
+    LineNr = { fg = colors.gray, bg = bg },
+    CursorLine = { bg = bg },
     StatusLine = { fg = colors.fg, bg = colors.blue },
     Visual = { bg = colors.blue, fg = colors.bg },
 
