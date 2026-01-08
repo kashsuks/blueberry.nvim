@@ -64,4 +64,18 @@ function M.setup(opts)
   end
 end
 
+-- light and dark theme toggle
+function M.toggle()
+  M.config.theme = M.config.theme == "dark" and "light" or "dark"
+  M.setup(M.config)
+end
+
+function M.load()
+  M.setup(M.config)
+end
+
+vim.api.nvim_create_user_command("BlueberryToggle", function()
+  require("blueberry").toggle()
+end, {})
+
 return M
