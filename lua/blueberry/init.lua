@@ -92,6 +92,13 @@ function M.setup(opts)
   local is_transparent = resolve_transparent(M.config.transparent)
   local bg = M.config.transparent and "NONE" or colors.bg
 
+  M.state = {
+    theme = theme,
+    colors = colors,
+    is_transparent = is_transparent,
+    bg = bg,
+  }
+
   local function telescope_title(color)
     if is_transparent then
       return { fg = color, bg = "NONE", bold = true}
@@ -155,6 +162,10 @@ function M.setup(opts)
   for group, hl_opts in pairs(highlights) do
     vim.api.nvim_set_hl(0, group, hl_opts)
   end
+
+  pcall(function()
+    require("blueberry.zen").apply_if_active(M.state)
+  end)
 end
 
 -- light and dark theme toggle
@@ -170,6 +181,19 @@ end
 
 vim.api.nvim_create_user_command("BlueberryToggle", function()
   require("blueberry").toggle()
+end, {})
+
+vim.api.nvim_create_user_command("Zen", function()
+  local bb = require("blueberry")
+  if not bb.state then
+    bb.setup(bb.config)
+  end
+  require("blueberry.zen").toggle(bb.state)
+end, {})
+
+-- alias for :zen 
+vim.api.nvim_create_user_command("zen", function()
+  vim.cmd("Zen")
 end, {})
 
 return M
