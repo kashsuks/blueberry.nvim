@@ -191,9 +191,4 @@ vim.api.nvim_create_user_command("Zen", function()
   require("blueberry.zen").toggle(bb.state)
 end, {})
 
--- alias for :zen 
-vim.api.nvim_create_user_command("Zen", function()
-  vim.cmd("Zen")
-end, {})
-
 return M
