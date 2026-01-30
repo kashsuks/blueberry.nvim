@@ -89,7 +89,7 @@ function M.setup(opts)
 
   vim.o.background = theme
 
-  local is_transparent = M.config.transparent
+  local is_transparent = resolve_transparent(M.config.transparent)
   local bg = M.config.transparent and "NONE" or colors.bg
 
   local function telescope_title(color)
@@ -128,7 +128,6 @@ function M.setup(opts)
     TelescopePromptTitle = telescope_title(colors.purple),
     TelescopePromptPrefix = { fg = colors.purple, bg = bg, bold = true },
 
-
     TelescopeResultsNormal = { fg = colors.fg, bg = bg},
     TelescopeResultsBorder = { fg = colors.blue, bg = bg},
     TelescopeResultsTitle = telescope_title(colors.green),
@@ -153,14 +152,15 @@ function M.setup(opts)
   }
 
   -- apply highlights
-  for group, opts in pairs(highlights) do
-    vim.api.nvim_set_hl(0, group, opts)
+  for group, hl_opts in pairs(highlights) do
+    vim.api.nvim_set_hl(0, group, hl_opts)
   end
 end
 
 -- light and dark theme toggle
 function M.toggle()
-  M.config.theme = M.config.theme == "dark" and "light" or "dark"
+  local theme = resolve_theme(M.config.theme)
+  M.config.theme = (theme == "dark") and "light" or "dark"
   M.setup(M.config)
 end
 
