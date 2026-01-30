@@ -192,7 +192,7 @@ vim.api.nvim_create_user_command("Zen", function()
 end, {})
 
 -- alias for :zen 
-vim.api.nvim_create_user_command("zen", function()
+vim.api.nvim_create_user_command("Zen", function()
   vim.cmd("Zen")
 end, {})
 
