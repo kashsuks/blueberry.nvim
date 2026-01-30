@@ -21,7 +21,7 @@ local function hex_to_rgb(hex)
   local b = tonumber(hex:sub(5, 6), 16)
   if not r or not g or not b then return nil end
   return r, g, b
-end 
+end
 
 local function rgb_to_hex(r, g, b)
   r = math.max(0, math.min(255, math.floor(r + 0.5)))
@@ -30,14 +30,19 @@ local function rgb_to_hex(r, g, b)
   return string.format("#%02x%02x%02x", r, g, b)
 end
 
-local function blend(fg, bg, alpha)
+local function blend(fg_hex, bg_hex, alpha)
   alpha = clamp01(alpha or 0.5)
-  local fr, fg_g, fb = hex_to_rgb(fg)
-  local br, bg_g, bb = hex_to_rgb(bg)
-  if not fr or not br then return fg end
+
+  local fr, fg_g, fb = hex_to_rgb(fg_hex)
+  local br, bg_g, bb = hex_to_rgb(bg_hex)
+
+  if not fr or not br then 
+    return fg_hex
+  end
+
   local r = (alpha * fr) + ((1 - alpha) * br)
-  local g = (alpha * fg_g) + ((1 - alpha) * bg_g)
-  local b = (alpha * fb) _ ((1 - alpha) * bb) 
+  local g = (alpha * fg) + ((1 - alpha) * bg)
+  local b = (alpha * fb) + ((1 - alpha) * bb) 
   return rgb_to_hex(r, g, b) 
 end
 
@@ -49,7 +54,10 @@ local function get_hl(name)
 
   if vim.api.nvim_get_hl_by_name then
     local ok, hl = pcall(vim.api.nvim_get_hl_by_name, name, true)
-    if ok then return hl end
+
+    if ok then 
+      return hl 
+    end
   end
   return {}
 end
@@ -77,7 +85,10 @@ local function apply_zen(state)
   vim.o.cursorline = true
 
   save_hl_once("LineNr")
-  set_hl("LineNr", { fg = blend(colors.gray, base_bg, 0.55), bg = transparent and "NONE" or base_bg })
+  set_hl("LineNr", { 
+    fg = blend(colors.gray, base_bg, 0.55),
+    bg = transparent and "NONE" or base_bg 
+  })
 
   save_hl_once("Comment")
   set_hl("Comment", { fg = blend(colors.gray, base_bg, 0.45), italic})
@@ -128,13 +139,8 @@ local function restore()
   Z._saved_opts = nil
 
   for name, hl in pairs(Z._saved_hl) do
-    if hl == nil then
-      vim.api.nvim_set_hl(0, name, {})
-    else
-      vim.api.nvim_set_hl(0, name, hl)
-    end
+    vim.api.nvim_set_hl(0, name, hl or {})
   end
-
   Z._saved_hl = {}
 end
 
