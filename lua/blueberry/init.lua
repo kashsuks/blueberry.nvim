@@ -37,7 +37,15 @@ function M.setup(opts)
 
   vim.o.background = M.config.theme
 
+  local is_transparent = M.config.transparent
   local bg = M.config.transparent and "NONE" or colors.bg
+
+  local function telescope_title(color)
+    if is_transparent then
+      return { fg = color, bg = "NONE", bold = true}
+    end
+      return { fg = colors.bg, bg = color, bold = true}
+  end
 
   -- highlight groups
   local highlights = {
@@ -56,6 +64,39 @@ function M.setup(opts)
     -- tree sitter
     ["@variable"] = { fg = colors.blue },
     ["@keyword"] = { fg = colors.blue },
+
+    -- telescope 
+    TelescopeNormal = { fg = colors.fg, bg = bg},
+    TelescopeBorder = { fg = colors.blue, bg = bg},
+    TelescopeTitle = telescope_title(colors.blue),
+
+    TelescopePromptNormal = { fg = colors.fg, bg = bg},
+    TelescopePromptBorder = { fg = colors.blue, bg = bg},
+    TelescopePromptTitle = telescope_title(colors.purple),
+    TelescopePromptPrefix = { fg = colors.purple, bg = bg, bold = true },
+
+
+    TelescopeResultsNormal = { fg = colors.fg, bg = bg},
+    TelescopeResultsBorder = { fg = colors.blue, bg = bg},
+    TelescopeResultsTitle = telescope_title(colors.green),
+
+    TelescopePreviewNormal = { fg = colors.fg, bg = bg },
+    TelescopePreviewBorder = { fg = colors.blue, bg = bg },
+    TelescopePreviewTitle = telescope_title(colors.cyan),
+
+    TelescopeMatching = { fg = colors.yellow, bold = true },
+
+    -- when in transparent mode, avoid a big filled selction block
+    TelescopeSelection = is_transparent
+      and { fg = colors.fg, bg = "NONE", underline = true, bold = true}
+      or { fg = colors.fg, bg = colors.blue},
+    TelescopeSelectionCaret = is_transparent
+      and { fg = colors.blue, bg = "NONE", bold = true }
+      or { fg = colors.bg, bg = colors.blue, bold = true },
+
+    TelescopeMultiSelection = { fg = colors.yellow, bold = true },
+    TelescopeMultiIcon = { fg = colors.yellow },
+    TelescopeResultsComment = { fg = colors.gray, italic = true },
   }
 
   -- apply highlights
