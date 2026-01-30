@@ -1,8 +1,12 @@
 local M = {}
 
 M.config = {
-  theme = "dark", -- can be "dark" or "light" by default
-  transparent = true,
+  -- theme can be: "dark", "light", or "auto"
+  -- "auto" follows vim.o.background ("dark"/"light")
+  theme = "auto", -- can be "dark" or "light" by default
+  -- transparent can be: true, false, or "auto",
+  -- "auto" tries to respect an already-transparent UI (winblend/pumblend or Normal bg = NONE)
+  transparent = "auto",
 }
 
 local palettes = {
@@ -30,12 +34,60 @@ local palettes = {
   }
 }
 
+local function get_hl(name)
+  -- Neovim 0.9+: nvim_get_hl
+  if vim.apu.nvim_get_hl then
+    local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
+    if ok then return hl end
+  end
+
+  -- older version fallback: nvim_get_hl_by_name (return decimal colors)
+  if vim.api.nvim_get_hl_by_name() then
+    local ok, hl = pcall(vim.api.nvim_get_hl_by_name, name, true)
+    if ok then return hl end
+  end
+
+  return {}
+end
+
+local function resolve_theme(theme_opt)
+  if theme_opt == "auto" then
+    return (vim.o.background == "light") and "light" or "dark"
+  end
+  return (theme_opt == "light") and "light" or "dark"
+end
+
+local function resolve_transparent(transparent_opt)
+  if transparent_opt == "auto" then
+    -- if the user is already using blended floats/menus then transparency is usually wanted
+    if (vim.o.winblend and vim.o.winblend > 0) or (vim.o.pumblend and vim.o.pumblend > 0) then
+      return true
+    end 
+
+    -- if the current normal background is none, treat that as transparent
+    local normal = get_hl("Normal")
+    if normal and normal.bg == nil then
+      return true
+    end
+
+
+    return false
+  end
+  return transparent_opt and true or false
+end
+
 function M.setup(opts)
   M.config = vim.tbl_deep_extend("force", M.config, opts or {})
 
-  local colors = palettes[M.config.theme] or palettes.dark
+  -- core boilerplate for reloads
+  vim.o.termguicolors = true
+  vim.cmd("highlight clear")
+  vim.g.colors_name = "blueberry"
 
-  vim.o.background = M.config.theme
+  local theme = resolve_theme(M.config.theme)
+  local colors = palettes[theme] or palettes.dark
+
+  vim.o.background = theme
 
   local is_transparent = M.config.transparent
   local bg = M.config.transparent and "NONE" or colors.bg
@@ -57,13 +109,14 @@ function M.setup(opts)
     String = { fg = colors.green },
     Number = { fg = colors.yellow },
     LineNr = { fg = colors.gray, bg = bg },
-    CursorLine = { bg = bg },
+    CursorLine = is_transparent and { underline = true } or { bg = bg },
     StatusLine = { fg = colors.fg, bg = colors.blue },
-    Visual = { bg = colors.blue, fg = colors.bg },
+    Visual = is_transparent and { underline = true, bold = true }
+     or { bg = colors.blue, fg = colors.bg },
 
     -- tree sitter
     ["@variable"] = { fg = colors.blue },
-    ["@keyword"] = { fg = colors.blue },
+    ["@keyword"] = { fg = colors.purple, bold = true },
 
     -- telescope 
     TelescopeNormal = { fg = colors.fg, bg = bg},
