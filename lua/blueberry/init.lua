@@ -36,7 +36,7 @@ local palettes = {
 
 local function get_hl(name)
   -- Neovim 0.9+: nvim_get_hl
-  if vim.apu.nvim_get_hl then
+  if vim.api.nvim_get_hl then
     local ok, hl = pcall(vim.api.nvim_get_hl, 0, { name = name, link = false })
     if ok then return hl end
   end
