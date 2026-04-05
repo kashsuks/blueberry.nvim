@@ -6,12 +6,13 @@ M.config = {
   theme = "auto", -- can be "dark" or "light" by default
   -- transparent can be: true, false, or "auto",
   -- "auto" tries to respect an already-transparent UI (winblend/pumblend or Normal bg = NONE)
-  transparent = "auto",
+  transparent = true,
+  telescope_translucent = true,
 }
 
 local palettes = {
   dark = {
-    bg = "#1e1e2e",
+    bg = "#232634",
     fg = "#b4befe",
     red = "#df4576",
     green = "#00ffd2",
@@ -106,6 +107,21 @@ function M.setup(opts)
       return { fg = colors.bg, bg = color, bold = true}
   end
 
+  local telescope_glass = M.config.telescope_translucent
+  local glass_bg = telescope_glass and "NONE" or bg
+  local glass_border = telescope_glass and colors.gray or colors.blue
+  local glass_fg = telescope_glass and colors.fg or colors.fg
+
+  if telescope_glass then
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "TelescopeResults,TelescopePrompt,TelescopePreview",
+      callback = function()
+        vim.wo.winblend = 15
+      end,
+      once = true,
+    })
+  end
+
   -- highlight groups
   local highlights = {
     Normal = { fg = colors.fg, bg = bg },
@@ -126,32 +142,33 @@ function M.setup(opts)
     ["@keyword"] = { fg = colors.purple, bold = true },
 
     -- telescope 
-    TelescopeNormal = { fg = colors.fg, bg = bg},
-    TelescopeBorder = { fg = colors.blue, bg = bg},
+    TelescopeNormal = { fg = glass_fg, bg = glass_bg },
+    TelescopeBorder = { fg = glass_border, bg = glass_bg, sp = glass_border },
     TelescopeTitle = telescope_title(colors.blue),
 
-    TelescopePromptNormal = { fg = colors.fg, bg = bg},
-    TelescopePromptBorder = { fg = colors.blue, bg = bg},
+    TelescopePromptNormal = { fg = glass_fg, bg = glass_bg },
+    TelescopePromptBorder = { fg = glass_border, bg = glass_bg, sp = glass_border },
     TelescopePromptTitle = telescope_title(colors.purple),
-    TelescopePromptPrefix = { fg = colors.purple, bg = bg, bold = true },
+    TelescopePromptPrefix = { fg = colors.purple, bg = glass_bg, bold = true },
 
-    TelescopeResultsNormal = { fg = colors.fg, bg = bg},
-    TelescopeResultsBorder = { fg = colors.blue, bg = bg},
+    TelescopeResultsNormal = { fg = glass_fg, bg = glass_bg },
+    TelescopeResultsBorder = { fg = glass_border, bg = glass_bg, sp = glass_border },
     TelescopeResultsTitle = telescope_title(colors.green),
 
-    TelescopePreviewNormal = { fg = colors.fg, bg = bg },
-    TelescopePreviewBorder = { fg = colors.blue, bg = bg },
+    TelescopePreviewNormal = { fg = glass_fg, bg = glass_bg },
+    TelescopePreviewBorder = { fg = glass_border, bg = glass_bg, sp = glass_border },
     TelescopePreviewTitle = telescope_title(colors.cyan),
 
     TelescopeMatching = { fg = colors.yellow, bold = true },
 
-    -- when in transparent mode, avoid a big filled selction block
-    TelescopeSelection = is_transparent
+    TelescopeSelection = telescope_glass
       and { fg = colors.fg, bg = "NONE", underline = true, bold = true}
-      or { fg = colors.fg, bg = colors.blue},
-    TelescopeSelectionCaret = is_transparent
-      and { fg = colors.blue, bg = "NONE", bold = true }
-      or { fg = colors.bg, bg = colors.blue, bold = true },
+      or (is_transparent and { fg = colors.fg, bg = "NONE", underline = true, bold = true}
+      or { fg = colors.fg, bg = colors.blue}),
+    TelescopeSelectionCaret = telescope_glass
+      and { fg = glass_border, bg = "NONE", bold = true }
+      or (is_transparent and { fg = colors.blue, bg = "NONE", bold = true }
+      or { fg = colors.bg, bg = colors.blue, bold = true }),
 
     TelescopeMultiSelection = { fg = colors.yellow, bold = true },
     TelescopeMultiIcon = { fg = colors.yellow },
