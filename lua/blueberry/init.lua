@@ -12,11 +12,11 @@ M.config = {
 
 local palettes = {
   dark = {
-    bg = "#232634",
+    bg = "#232639",
     fg = "#b4befe",
     red = "#df4576",
     green = "#00ffd2",
-    blue = "#00a9ff",
+    blue = "#C19CEE",
     yellow = "#f9e2af",
     purple = "#cba6f7",
     cyan = "#89dceb",
